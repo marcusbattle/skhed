@@ -19,7 +19,7 @@ class Skhed {
 
 		// Require CMB2 for Metabox support
 		if ( file_exists(plugin_dir_path( __FILE__ ) . 'includes/CMB2/init.php' ) ) {
-			require_once plugin_dir_path( __FILE__ ) . 'includes/cmb2/init.php';
+			require_once plugin_dir_path( __FILE__ ) . 'includes/CMB2/init.php';
 		}
 
 		// Register Custom Post Types
