@@ -594,7 +594,7 @@ class Skhed {
 		// Customer
 		$appointment_metabox->add_field( array(
 			'name' => __( 'Customer', 'shked' ),
-			'id'   => $prefix . 'user_id',
+			'id'   => $prefix . 'customer',
 			'type' => 'user_display'
 		) );
 
@@ -785,9 +785,12 @@ class Skhed {
 	 */
 	public function cmb2_user_display( $field, $escaped_value, $object_id, $object_type, $field_type_object ) {
 
-		$user = get_user_by( 'id', $escaped_value );
+		$customer_meta = get_post_meta( $object_id, '_appointment_customer_meta', true );
 
-		echo $user->user_nicename;
+		echo "<pre>";
+		print_r( $escaped_value );
+		print_r( $customer_meta ); 
+		echo "</pre>";
 
 	}
 
@@ -841,6 +844,15 @@ class Skhed {
 				update_post_meta( $appointment_created, '_appointment_delivery_location', $delivery_location );
 				update_post_meta( $appointment_created, '_appointment_quantities', $quantities );
 				update_post_meta( $appointment_created, '_appointment_additional_comments', $additional_comments );
+
+				$customer = array(
+					'first_name' => $customer_data['meta']['first_name'],
+					'last_name' => $customer_data['meta']['last_name'],
+					'email' => $customer_data['user_email'],
+					'mobile' => $customer_data['meta']['mobile_number']
+				);
+
+				update_post_meta( $appointment_created, '_appointment_customer', $customer );
 
 				echo "Your order has been successfully placed. You may close this window.";
 				exit;
