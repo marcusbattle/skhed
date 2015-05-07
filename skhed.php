@@ -814,7 +814,7 @@ class Skhed {
 			if ( ! $customer = $this->get_customer( $customer_data ) ) {
 				$customer = $this->create_customer( $customer_data );
 			}
-
+			
 			$customer_id = isset( $_POST['customer_id'] ) ? $_POST['customer_id'] : $customer->ID;
 
 			if ( ! $availability_id ) {
@@ -863,12 +863,16 @@ class Skhed {
 		if ( empty( $user_args['user_email'] ) ) {
 			$user_args['meta_key'] = 'mobile_number';
 			$user_args['meta_value'] = isset( $customer_data['meta']['mobile_number'] ) ? $customer_data['meta']['mobile_number'] : '';
-		}
 
-		$users = get_users( $user_args );
+			$users = get_users( $user_args );
+			$user = isset( $users[0] ) ? $users[0] : array();
 
-		$user = isset( $users[0] ) ? $users[0] : array();
+		} else {
 
+			$user = get_user_by( 'email', $user_args['user_email'] );
+
+		}	
+		
 		if ( $user ) {
 
 			$this->update_customer_meta( $user->ID, $customer_data );
@@ -896,7 +900,7 @@ class Skhed {
 	 */
 	public function create_customer( $customer_data = array() ) {
 
-		$customer_data['user_login'] = isset( $customer_data['user_nicename'] ) ? $customer_data['user_nicename'] : '';
+		$customer_data['user_login'] = isset( $customer_data['meta']['first_name'], $customer_data['meta']['last_name'] ) ? sanitize_user( $customer_data['meta']['first_name'] . $customer_data['meta']['last_name'] ) : '';
 
 		$user_created = wp_insert_user( $customer_data );
 
