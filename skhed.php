@@ -524,7 +524,7 @@ class Skhed {
 
 					if ( $quantity ) {
 
-						echo get_the_title( $product_id ) . ' (' . $quantity . ')';
+						echo get_the_title( $product_id ) . ' (' . $quantity . ")\n";
 
 					}
 
