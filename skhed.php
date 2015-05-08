@@ -483,7 +483,7 @@ class Skhed {
 		$columns['customer'] = __( 'Customer', 'skhed' );
 		$columns['location'] = __( 'Location', 'skhed' );
 		$columns['products'] = __( 'Products', 'skhed' );
-		// $columns['total_cost'] = __( 'Total Cost', 'skhed' );
+		$columns['total_cost'] = __( 'Total Cost', 'skhed' );
 		$columns['date'] = __( 'Date', 'skhed' );
 
 		return $columns;
