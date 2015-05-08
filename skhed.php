@@ -481,6 +481,7 @@ class Skhed {
 		$columns['service'] = __( 'Service', 'skhed' );
 		$columns['customer'] = __( 'Customer', 'skhed' );
 		$columns['location'] = __( 'Location', 'skhed' );
+		$columns['products'] = __( 'Products', 'skhed' );
 		$columns['total_cost'] = __( 'Total Cost', 'skhed' );
 		$columns['date'] = __( 'Date', 'skhed' );
 
@@ -512,6 +513,22 @@ class Skhed {
 				$last_name = isset( $customer['last_name'] ) ? $customer['last_name'] : '';
 				
 				echo $first_name . ' ' . $last_name;
+
+				break;
+
+			case 'products':
+				
+				$quantities = get_post_meta( $post_id, '_appointment_quantities', true );
+				
+				foreach ( $quantities as $product_id => $quantity ) {
+
+					if ( $quantity ) {
+
+						echo get_the_title( $product_id ) . ' (' . $quantity . ')';
+
+					}
+
+				}
 
 				break;
 
