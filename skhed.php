@@ -479,10 +479,11 @@ class Skhed {
 		unset( $columns['date'] );
 
 		$columns['service'] = __( 'Service', 'skhed' );
+		$columns['time'] = __( 'Time', 'skhed' );
 		$columns['customer'] = __( 'Customer', 'skhed' );
 		$columns['location'] = __( 'Location', 'skhed' );
 		$columns['products'] = __( 'Products', 'skhed' );
-		$columns['total_cost'] = __( 'Total Cost', 'skhed' );
+		// $columns['total_cost'] = __( 'Total Cost', 'skhed' );
 		$columns['date'] = __( 'Date', 'skhed' );
 
 		return $columns;
@@ -497,6 +498,17 @@ class Skhed {
 				
 				$service_id = get_post_meta( $post_id, '_appointment_service_id', true );
 				echo ( $service_id ) ? get_the_title( $service_id ) : '--';
+				break;
+
+			case 'time':
+				
+				$availability_id = get_post_meta( $post_id, '_appointment_time', true );
+				
+				$time_of_day = get_post_meta( $availability_id, '_availability_time_of_day', true );
+				$day_of_week = get_post_meta( $availability_id, '_availability_day_of_week', true );
+
+				echo $day_of_week . ' ' . $time_of_day;
+
 				break;
 
 			case 'location':
