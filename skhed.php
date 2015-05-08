@@ -654,7 +654,7 @@ class Skhed {
 
 		$appointment_metabox->add_field( array(
 			'name' => __( 'Special Comments', 'shked' ),
-			'id'   => $prefix . 'comments',
+			'id'   => $prefix . 'additional_comments',
 			'type' => 'textarea'
 		) );
 	}
