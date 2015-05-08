@@ -39,6 +39,7 @@ class Skhed {
 		add_action( 'cmb2_render_availability_select', array( $this, 'cmb2_availability_select' ), 10, 5 );
 		add_action( 'cmb2_render_product_select', array( $this, 'cmb2_product_select' ), 10, 5 );
 		add_action( 'cmb2_render_user_display', array( $this, 'cmb2_user_display' ), 10, 5 );
+		add_action( 'cmb2_render_products_display', array( $this, 'cmb2_products_display' ), 10, 5 );
 
 		//  Modify tables for Custom Post Types
 		add_filter( 'manage_availability_posts_columns', array( $this, 'availability_columns' ) );
@@ -478,8 +479,8 @@ class Skhed {
 		unset( $columns['date'] );
 
 		$columns['service'] = __( 'Service', 'skhed' );
-		$columns['location'] = __( 'Location', 'skhed' );
 		$columns['customer'] = __( 'Customer', 'skhed' );
+		$columns['location'] = __( 'Location', 'skhed' );
 		$columns['total_cost'] = __( 'Total Cost', 'skhed' );
 		$columns['date'] = __( 'Date', 'skhed' );
 
@@ -501,6 +502,16 @@ class Skhed {
 				
 				$delivery_location = get_post_meta( $post_id, '_appointment_delivery_location', true );
 				echo ( $delivery_location ) ? $delivery_location : '--';
+
+				break;
+
+			case 'customer':
+				
+				$customer = get_post_meta( $post_id, '_appointment_customer', true );
+				$first_name = isset( $customer['first_name'] ) ? $customer['first_name'] : '';
+				$last_name = isset( $customer['last_name'] ) ? $customer['last_name'] : '';
+				
+				echo $first_name . ' ' . $last_name;
 
 				break;
 
@@ -598,13 +609,25 @@ class Skhed {
 			'type' => 'user_display'
 		) );
 
-		// Customer
+		// Delivery Location
 		$appointment_metabox->add_field( array(
 			'name' => __( 'Delivery Location', 'shked' ),
 			'id'   => $prefix . 'delivery_location',
 			'type' => 'text'
 		) );
 
+		// Products
+		$appointment_metabox->add_field( array(
+			'name' => __( 'Products', 'shked' ),
+			'id'   => $prefix . 'products',
+			'type' => 'products_display'
+		) );
+
+		$appointment_metabox->add_field( array(
+			'name' => __( 'Special Comments', 'shked' ),
+			'id'   => $prefix . 'comments',
+			'type' => 'textarea'
+		) );
 	}
 
 	/**
@@ -791,6 +814,32 @@ class Skhed {
 		print_r( $escaped_value );
 		print_r( $customer_meta ); 
 		echo "</pre>";
+
+	}
+
+	public function cmb2_products_display( $field, $escaped_value, $object_id, $object_type, $field_type_object ) {
+
+		$quantities = get_post_meta( $object_id, '_appointment_quantities', true );
+
+		echo "<table>";
+		echo "<thead>";
+		echo "<tr><td><strong>Product</strong></td><td><strong>Quantity</strong></td></tr>";
+		echo "</thead>";
+
+		foreach ( $quantities as $product_id => $quantity ) {
+
+			if ( $quantity ) {
+
+				echo "<tr>";
+				echo "<td>" . get_the_title( $product_id ) . "</td>";
+				echo "<td>" . $quantity . "</td>";
+				echo "</tr>";
+
+			}
+
+		}
+
+		echo "</table>";
 
 	}
 
