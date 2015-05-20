@@ -48,6 +48,8 @@ class Skhed {
 		add_action( 'manage_appointment_posts_custom_column' , array( $this, 'appointment_column_data' ), 10, 2 );
 
 		add_action( 'init', array( $this, 'submit_appointment' ) );
+
+		add_action( 'save_post', array( $this, 'save_availability' ), 10, 3 );
 	}
 
 	/**
@@ -95,10 +97,10 @@ class Skhed {
 			'posts_per_page' => -1,
 			'post_status' => 'publish',
 			'meta_query' => array( $meta_query ),
-			'orderby'   => 'meta_value',
-			'meta_key' => '_availability_time_of_day',
+			'meta_key' => '_availability_time_of_day_actual',
 			'meta_type'  => 'time',
-			'order' => 'ASC'
+			'order' => 'ASC',
+			'orderby'   => 'meta_value_num',
 		);
 
 		$query = new WP_Query( $args );
@@ -112,14 +114,16 @@ class Skhed {
 	 */
 	public function get_appointments( $availability_id ) {
 
+		$availability_date = $this->convert_availability_to_date( $availability_id );
+
 		$args = array(
 			'post_type' => 'appointment',
 			'posts_per_page' => -1,
 			'post_status' => 'publish',
 			'meta_query' => array( 
 				array(
-					'key' => '_appointment_time',
-					'value' => $availability_id,
+					'key' => '_appointment_date',
+					'value' => $availability_date,
 					'compare' => '='
 				) 
 			),
@@ -879,10 +883,6 @@ class Skhed {
 
 		if ( ! empty( $_POST ) && isset( $_POST['action'] ) && ( $_POST['action'] == 'submit_appointment' ) ) {
 
-			// echo "<pre>";
-			// print_r( $_POST );
-			// exit;
-
 			$customer_data = isset( $_POST['customer'] ) ? $_POST['customer'] : array();
 			$service_id = isset( $_POST['service_id'] ) ? $_POST['service_id'] : 0;
 			$appointment_total_cost = isset( $_POST['appointment_total_cost'] ) ? $_POST['appointment_total_cost'] : 0;
@@ -890,6 +890,9 @@ class Skhed {
 			$delivery_location = isset( $_POST['delivery_location'] ) ? $_POST['delivery_location'] : 0;
 			$additional_comments = isset( $_POST['additional_comments'] ) ? $_POST['additional_comments'] : 0;
 			$quantities = isset( $_POST['quantities'] ) ? $_POST['quantities'] : array();
+
+			$availability_date = $this->convert_availability_to_date( $availability_id );
+	
 
 			// Create customer if they don't exist in WP
 			if ( ! $customer = $this->get_customer( $customer_data ) ) {
@@ -916,6 +919,7 @@ class Skhed {
 			if ( $appointment_created ) {
 
 				update_post_meta( $appointment_created, '_appointment_service_id', $service_id );
+				update_post_meta( $appointment_created, '_appointment_date', $availability_date );
 				update_post_meta( $appointment_created, '_appointment_time', $availability_id );
 				update_post_meta( $appointment_created, '_appointment_user_id', $customer_id );
 				update_post_meta( $appointment_created, '_appointment_total_cost', $appointment_total_cost );
@@ -1025,6 +1029,36 @@ class Skhed {
 
 	}
 
+	public function convert_availability_to_date( $availability_id = 0 ) {
+
+		if ( ! $availability_id ) {
+			return '';
+		}
+
+		$day_of_week = get_post_meta( $availability_id, '_availability_day_of_week', true ); 
+		$time_of_day = get_post_meta( $availability_id, '_availability_time_of_day', true ); 
+
+		$availability_date = date('Y-m-d H:i:s', strtotime( $day_of_week . ' ' . $time_of_day ) );
+
+		return $availability_date;
+
+	}
+
+	public function save_availability( $post_id, $post, $update ) {
+
+		// If this isn't a 'book' post, don't update it.
+	    if ( $post->post_type != 'availability' ) {
+	        return;
+	    }
+
+	    if ( isset( $_REQUEST['_availability_time_of_day'] ) ) {
+	    	
+	    	$time_of_day_actual = strtotime( $_REQUEST['_availability_time_of_day'] );
+	        update_post_meta( $post_id, '_availability_time_of_day_actual', $time_of_day_actual );
+
+	    }
+
+	}
 
 }
 
